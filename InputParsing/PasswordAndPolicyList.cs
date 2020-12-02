@@ -8,15 +8,15 @@ namespace InputParsing
     {
         public struct Policy
         {
-            public int repeatMin;
-            public int repeatMax;
-            public char repeatCharacter;
+            public int FirstInt;
+            public int SecondInt;
+            public char Character;
         };
 
         public struct Entry
         {
-            public Policy policy;
-            public string password;
+            public Policy Policy;
+            public string Password;
         }
 
 
@@ -38,8 +38,8 @@ namespace InputParsing
 
                     string password = policyAndPassword[1].Trim();
 
-                    var policy = new Policy { repeatMin = min, repeatMax = max, repeatCharacter = character };
-                    var entry = new Entry { policy = policy, password = password };
+                    var policy = new Policy { FirstInt = min, SecondInt = max, Character = character };
+                    var entry = new Entry { Policy = policy, Password = password };
 
                     inputs.Add(entry);
                 }

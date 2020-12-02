@@ -13,6 +13,8 @@ namespace Day1
 
             Console.WriteLine();
             Console.WriteLine("Results: ");
+
+            // 2 numbers
             for (int i = 0; i < inputs.Count; ++i)
             {
                 for (int j = 0; j < inputs.Count; ++j)
@@ -25,6 +27,28 @@ namespace Day1
                         if (lhs + rhs == 2020)
                         {
                             Console.WriteLine("{0} * {1} = {2}", lhs, rhs, lhs * rhs);
+                        }
+                    }
+                }
+            }
+
+            // 3 numbers
+            for (int i = 0; i < inputs.Count; ++i)
+            {
+                for (int j = 0; j < inputs.Count; ++j)
+                {
+                    for (int k = 0; k < inputs.Count; ++k)
+                    {
+                        if (i != j && j != k)
+                        {
+                            int var1 = inputs[i];
+                            int var2 = inputs[j];
+                            int var3 = inputs[k];
+
+                            if (var1 + var2 + var3 == 2020)
+                            {
+                                Console.WriteLine("{0} * {1} * {2} = {3}", var1, var2, var3, var1 * var2 * var3);
+                            }
                         }
                     }
                 }

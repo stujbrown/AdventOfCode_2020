@@ -3,11 +3,13 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 16
 VisualStudioVersion = 16.0.30717.126
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Day1", "Day1\Day1.csproj", "{74883F17-1FC9-4E8A-AA1A-BC00A06C8238}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Day1", "Day1\Day1.csproj", "{74883F17-1FC9-4E8A-AA1A-BC00A06C8238}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "InputParsing", "InputParsing\InputParsing.csproj", "{3EBF58B7-A9F0-4D80-83AD-550F3CD27339}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "InputParsing", "InputParsing\InputParsing.csproj", "{3EBF58B7-A9F0-4D80-83AD-550F3CD27339}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Day2", "Day2\Day2.csproj", "{739A8B6B-77EE-4484-BCED-2BCAB6E7C5C5}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Day3", "Day3\Day3.csproj", "{942B8E00-93E3-4FE2-8295-39704FDBC6E0}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -27,6 +29,10 @@ Global
 		{739A8B6B-77EE-4484-BCED-2BCAB6E7C5C5}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{739A8B6B-77EE-4484-BCED-2BCAB6E7C5C5}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{739A8B6B-77EE-4484-BCED-2BCAB6E7C5C5}.Release|Any CPU.Build.0 = Release|Any CPU
+		{942B8E00-93E3-4FE2-8295-39704FDBC6E0}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{942B8E00-93E3-4FE2-8295-39704FDBC6E0}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{942B8E00-93E3-4FE2-8295-39704FDBC6E0}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{942B8E00-93E3-4FE2-8295-39704FDBC6E0}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

@@ -15,11 +15,11 @@ namespace Day5
                 {
                     string line = reader.ReadLine();
                     codes.Add(line);
-                    Console.WriteLine(line);
                 }
             }
 
             int highestId = 0;
+            SortedSet<int> sortedIds = new SortedSet<int>();
             foreach (string code in codes)
             {
                 Func<string, int, int, char, char, int> BinaryChop = (string str, int lowerStart, int upperStart, char lowerChar, char upperChar) =>
@@ -60,12 +60,21 @@ namespace Day5
                 int id = (row * 8) + column;
                 Console.WriteLine("{0}: row {1} column {2} - ID {3}", code, row, column, id);
 
+                sortedIds.Add(id);
                 highestId = Math.Max(highestId, id);
             }
 
             Console.WriteLine("Highest ID: {0}", highestId);
 
-
+            int lastID = -1;
+            foreach (int id in sortedIds)
+            {
+                if (id - lastID == 2)
+                {
+                    Console.WriteLine("ID space at: {0}", lastID + 1);
+                }
+                lastID = id;
+            }
         }
     }
 }

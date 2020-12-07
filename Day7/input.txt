@@ -545,6 +545,8 @@ vibrant green bags contain 4 plaid tomato bags.
 light tan bags contain 5 muted green bags.
 striped white bags contain 1 faded silver bag, 2 vibrant red bags.
 dull violet bags contain 5 dull turquoise bags.
+drab salmon bags contain 3 posh magenta bags, 1 dark teal bag.
+mirrored cyan bags contain 2 dim violet bags, 1 plaid aqua bag, 1 vibrant blue bag, 1 posh magenta bag.
 wavy teal bags contain 1 bright crimson bag, 2 light cyan bags, 4 striped silver bags.
 vibrant purple bags contain 5 shiny magenta bags, 1 dotted orange bag, 2 wavy teal bags.
 faded beige bags contain 1 posh green bag, 5 clear coral bags.

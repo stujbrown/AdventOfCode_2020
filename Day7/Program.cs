@@ -15,23 +15,38 @@ namespace Day7
             public int Count;
         };
 
-        static bool FindInBagRecursive(Dictionary<string, List<ContainedBagRule>> dictionary, string startColour, string searchColour)
+
+        static bool FindInBagRecursive(Dictionary<string, List<ContainedBagRule>> dictionary, string startBag, string searchBag)
         {
-            if (startColour.Equals(searchColour))
+            if (startBag.Equals(searchBag))
             {
                 return true;
             }
 
             bool found = false;
             List<ContainedBagRule> rules;
-            if (dictionary.TryGetValue(startColour, out rules))
+            if (dictionary.TryGetValue(startBag, out rules))
             {
                 foreach (var rule in rules)
                 {
-                    found |= FindInBagRecursive(dictionary, rule.ContainedBag, searchColour);
+                    found |= FindInBagRecursive(dictionary, rule.ContainedBag, searchBag);
                 }
             }
             return found;
+        }
+        static int CountBagsRecursive(Dictionary<string, List<ContainedBagRule>> dictionary, string startBag, int numBags)
+        {
+            int count = numBags;
+            List<ContainedBagRule> rules;
+            if (dictionary.TryGetValue(startBag, out rules))
+            {
+                foreach (var rule in rules)
+                {
+                    count += CountBagsRecursive(dictionary, rule.ContainedBag, numBags * rule.Count);
+                }
+            }
+
+            return count;
         }
 
         static void Main(string[] args)
@@ -71,7 +86,11 @@ namespace Day7
             var keysToCheck = ruleDictionary.Keys.Where(x => x.Equals(queryBag) == false);
             keysToCheck.ToList().ForEach(x => numValidBags += FindInBagRecursive(ruleDictionary, x, queryBag) == true ? 1 : 0);
 
+            // Part 2
+            int numContained = CountBagsRecursive(ruleDictionary, queryBag, 1) - 1;
+
             Console.WriteLine("Num bags which could contain {0}: {1}", queryBag, numValidBags);
+            Console.WriteLine("Total bags inside {0}: {1}", queryBag, numContained);
         }
     }
 }

@@ -27,10 +27,7 @@ namespace Day7
             List<ContainedBagRule> rules;
             if (dictionary.TryGetValue(startBag, out rules))
             {
-                foreach (var rule in rules)
-                {
-                    found |= FindInBagRecursive(dictionary, rule.ContainedBag, searchBag);
-                }
+                rules.ForEach(rule => found |= FindInBagRecursive(dictionary, rule.ContainedBag, searchBag));
             }
             return found;
         }
@@ -40,10 +37,7 @@ namespace Day7
             List<ContainedBagRule> rules;
             if (dictionary.TryGetValue(startBag, out rules))
             {
-                foreach (var rule in rules)
-                {
-                    count += CountBagsRecursive(dictionary, rule.ContainedBag, numBags * rule.Count);
-                }
+                rules.ForEach(rule => count += CountBagsRecursive(dictionary, rule.ContainedBag, numBags * rule.Count));
             }
 
             return count;

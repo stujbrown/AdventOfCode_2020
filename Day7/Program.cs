@@ -1,0 +1,77 @@
+﻿using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Text.RegularExpressions;
+using System.Linq;
+
+namespace Day7
+{
+
+    class Program
+    {
+        struct ContainedBagRule
+        {
+            public string ContainedBag;
+            public int Count;
+        };
+
+        static bool FindInBagRecursive(Dictionary<string, List<ContainedBagRule>> dictionary, string startColour, string searchColour)
+        {
+            if (startColour.Equals(searchColour))
+            {
+                return true;
+            }
+
+            bool found = false;
+            List<ContainedBagRule> rules;
+            if (dictionary.TryGetValue(startColour, out rules))
+            {
+                foreach (var rule in rules)
+                {
+                    found |= FindInBagRecursive(dictionary, rule.ContainedBag, searchColour);
+                }
+            }
+            return found;
+        }
+
+        static void Main(string[] args)
+        {
+            var ruleDictionary = new Dictionary<string, List<ContainedBagRule>>();
+
+            using (TextReader reader = File.OpenText("input.txt"))
+            {
+                while (reader.Peek() >= 0)
+                {
+                    string[] segments = reader.ReadLine().Split(',');
+
+                    // If not matched it's a dead-end colour
+                    Match match = Regex.Match(segments[0], @"^(.+?)bags contain ([0-9]+) (.+?) bag");
+                    if (match.Success)
+                    {
+                        var rules = new List<ContainedBagRule>();
+                        rules.Add(new ContainedBagRule() { ContainedBag = match.Groups[3].Value.Trim(), Count = int.Parse(match.Groups[2].Value) });
+                        for (int segmentIndex = 1; segmentIndex < segments.Length; ++segmentIndex)
+                        {
+                            Match subMatch = Regex.Match(segments[segmentIndex], @"([0-9]+) (.+?) bag");
+                            if (subMatch.Success)
+                            {
+                                rules.Add(new ContainedBagRule() { ContainedBag = subMatch.Groups[2].Value.Trim(), Count = int.Parse(subMatch.Groups[1].Value) });
+                            }
+                        }
+
+                        ruleDictionary.Add(match.Groups[1].Value.Trim(), rules);
+                    }
+                }
+            }
+
+            string queryBag = "shiny gold";
+
+            // Part 1
+            int numValidBags = 0;
+            var keysToCheck = ruleDictionary.Keys.Where(x => x.Equals(queryBag) == false);
+            keysToCheck.ToList().ForEach(x => numValidBags += FindInBagRecursive(ruleDictionary, x, queryBag) == true ? 1 : 0);
+
+            Console.WriteLine("Num bags which could contain {0}: {1}", queryBag, numValidBags);
+        }
+    }
+}

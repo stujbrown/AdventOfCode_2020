@@ -35,9 +35,8 @@ namespace Day9
                     total += numbers[advanceIndex];
                     if (total == badNumber)
                     {
-                        var smallest = new ArraySegment<Int64>(numbers, currentIndex, advanceIndex - currentIndex).ToList().Min();
-                        var largest = new ArraySegment<Int64>(numbers, currentIndex, advanceIndex - currentIndex).ToList().Max();
-                        Console.WriteLine("Found range {0}+{1} = {2}", smallest, largest, smallest + largest);
+                        var segment = new ArraySegment<Int64>(numbers, currentIndex, advanceIndex - currentIndex).ToList();
+                        Console.WriteLine("Found range {0}+{1} = {2}", segment.Min(), segment.Max(), segment.Min() + segment.Max());
                         break;
                     }
                 }

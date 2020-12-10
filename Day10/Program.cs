@@ -18,9 +18,7 @@ namespace Day10
             sortList.Add(deviceJoltage);
             Int64[] numbers = sortList.ToArray();
 
-            numbers.ToList().ForEach(x => Console.WriteLine(x)); ;
-
-            var distribution = new int[maxDifference]; // for part 1
+            var distribution = new int[maxDifference];
 
             // Part 1
             Int64 currentJoltage = 0;
@@ -32,10 +30,6 @@ namespace Day10
                     ++distribution[diff - 1];
                     currentJoltage = number;
                 }
-                else
-                {
-                    continue;
-                }
             }
 
             // Part 2
@@ -44,25 +38,17 @@ namespace Day10
             for (int i = numbers.Length - 2; i >= 0; --i)
             {
                 int offset = 1;
-                while ((i + offset) < numbers.Length)
+                while ((i + offset) < numbers.Length &&
+                   (numbers[i + offset] - numbers[i]) > 0 &&
+                   (numbers[i + offset] - numbers[i]) <= maxDifference)
                 {
-                    var diff = numbers[i + offset] - numbers[i];
-                    if (diff > 0 && diff <= maxDifference)
-                    {
-                        numPossibilities[i] += numPossibilities[i + offset];
-                    }
-                    else
-                    {
-                        break;
-                    }
-
+                    numPossibilities[i] += numPossibilities[i + offset];
                     ++offset;
                 }
             }
 
             Int64 validArrangements = 0;
-            int countIndex = 0;
-            numbers.TakeWhile(x => (x <= maxDifference)).ToList().ForEach(x => validArrangements += numPossibilities[countIndex++]);
+            int countIndex = 0; numbers.TakeWhile(x => (x <= maxDifference)).ToList().ForEach(x => validArrangements += numPossibilities[countIndex++]);
 
             Console.WriteLine("Distribution of 1 [{0}] * distribution of 3 [{1}] = {2}", distribution[0], distribution[2], distribution[0] * distribution[2]);
             Console.WriteLine("Valid arrangements: {0}", validArrangements);

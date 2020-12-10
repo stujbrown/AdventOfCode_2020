@@ -48,7 +48,8 @@ namespace Day10
             }
 
             Int64 validArrangements = 0;
-            int countIndex = 0; numbers.TakeWhile(x => (x <= maxDifference)).ToList().ForEach(x => validArrangements += numPossibilities[countIndex++]);
+            int countIndex = 0;
+            numbers.TakeWhile(x => (x <= maxDifference)).ToList().ForEach(x => validArrangements += numPossibilities[countIndex++]);
 
             Console.WriteLine("Distribution of 1 [{0}] * distribution of 3 [{1}] = {2}", distribution[0], distribution[2], distribution[0] * distribution[2]);
             Console.WriteLine("Valid arrangements: {0}", validArrangements);

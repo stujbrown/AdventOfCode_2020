@@ -23,57 +23,46 @@ namespace Day16
             });
 
 
-            var validNearbyTickets = new List<Int64[]>();
             Int64 errorRate = 0;
-
-            var invalidFieldsPerIndex = new List<int>[fields.Keys.Count].Select(x => new List<int>()).ToArray();
+            
+            var validFieldsForEachTicketIndex = new List<int>[myTicket.Length].Select(x => new List<int>(Enumerable.Range(0, fields.Keys.Count))).ToList();
             foreach (Int64[] ticket in nearbyTickets)
             {
-                for (int valueIndex = 0; valueIndex < ticket.Length; ++valueIndex)
+                for (int ticketFieldIndex = 0; ticketFieldIndex < ticket.Length; ++ticketFieldIndex)
                 {
-                    var validRanges = fields.Values.Select((ranges, index) => Tuple.Create(ranges, index)).Where(ranges => ranges.Item1.Where(range => ticket[valueIndex] >= range.Item1 && ticket[valueIndex] <= range.Item2).Count() != 0);
-                    errorRate += (validRanges.Count() == 0) ? ticket[valueIndex] : 0;
+                    var validRanges = fields.Values.Select((ranges, index) => Tuple.Create(ranges, index)).Where(ranges => ranges.Item1.Where(range => ticket[ticketFieldIndex] >= range.Item1 && ticket[ticketFieldIndex] <= range.Item2).Count() != 0);
+                    errorRate += (validRanges.Count() == 0) ? ticket[ticketFieldIndex] : 0;
 
                     if (validRanges.Count() != 0) // ticket valid
                     {
-                        for (int fieldIndex = 0; fieldIndex < fields.Values.Count(); ++fieldIndex)
+                        foreach (var value in Enumerable.Range(0, fields.Keys.Count).Except(validRanges.Select(ranges => ranges.Item2)))
                         {
-                            if (validRanges.Where(rangeEntry => rangeEntry.Item2 == fieldIndex).Count() == 0)
-                            {
-                                invalidFieldsPerIndex[valueIndex].Add(fieldIndex);
-                                break;
-                            }
+                            validFieldsForEachTicketIndex[ticketFieldIndex].Remove(value);
                         }
                     }
                 }
             }
 
-            var sortedInvalidFieldsPerIndex = invalidFieldsPerIndex.Select((list, index) => Tuple.Create(list, index)).ToList();
-            sortedInvalidFieldsPerIndex.Sort((lhs, rhs) => lhs.Item1.Count < rhs.Item1.Count ? 1 : -1);
-
             var fieldIndices = new int[fields.Keys.Count];
-            List<int> remainingIndices = Enumerable.Range(0, fields.Keys.Count).ToList();
-            foreach (var invalidFields in sortedInvalidFieldsPerIndex)
+            for (int indicesFilled = 0; indicesFilled < fieldIndices.Length; ++indicesFilled)
             {
-                fieldIndices[invalidFields.Item2] = remainingIndices.Except(invalidFields.Item1).ToArray()[0];
-                remainingIndices.Remove(fieldIndices[invalidFields.Item2]);
-            }
+                var validIndicesForField = validFieldsForEachTicketIndex.Select((indices, index) => Tuple.Create(new List<int>(indices), index)).Where(fieldIndexList => fieldIndexList.Item1.Count == 1).ToArray();
+                fieldIndices[validIndicesForField[0].Item2] = validIndicesForField[0].Item1[0];
 
+                for (int x = 0; x < validFieldsForEachTicketIndex.Count; ++x)
+                {
+                    validFieldsForEachTicketIndex[x].Remove(validIndicesForField[0].Item1[0]);
+                }
+            }
 
             var departureValues = new List<Int64>();
             for (int fieldIndex = 0; fieldIndex < fields.Keys.Count; ++fieldIndex)
             {
                 if (fields.Keys.ToArray()[fieldIndex].StartsWith("departure"))
-                    departureValues.Add(myTicket[fieldIndices[fieldIndex]]);
+                {
+                     departureValues.Add(myTicket[fieldIndices.ToList().IndexOf(fieldIndex)]);
+                }
             }
-            
-            for (int fieldIndex = 0; fieldIndex < fields.Keys.Count; ++fieldIndex)
-            {
-
-                Console.WriteLine("{0} : {1}", fields.Keys.ToArray()[fieldIndex], myTicket[fieldIndices[fieldIndex]]);
-            }
-
-
 
             Console.WriteLine("Error rate: {0}", errorRate);
             Console.WriteLine("Ticket product: {0}", departureValues.Aggregate((lhs, rhs) => lhs * rhs));

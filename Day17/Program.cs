@@ -6,64 +6,26 @@ using System.Numerics;
 
 namespace Day17
 {
-    using CellDictionary = Dictionary<Tuple<Int64, Int64, Int64>, bool>;
-
     class Program
     {
-        static CellDictionary UpdateCells(CellDictionary cellStates)
+        struct IntVector { public Int64 X; public Int64 Y; public Int64 Z; public Int64 W; };
+
+        static Dictionary<IntVector, bool> UpdateCells(Dictionary<IntVector, bool> cellStates, List<IntVector> offsets)
         {
+            var updatedCellStates = new Dictionary<IntVector, bool>(cellStates);
 
-            //int[,] offsets = new int[26, 3] {
-            //        { -1, -1, -1 },
-            //        { -1, -1, 0 },
-            //        { -1, -1, 1 },
-            //        { -1, 0, -1 },
-            //        { -1, 0, 0 },
-            //        { -1, 0, 1 },
-            //        { -1, 1, -1 },
-            //        { -1, 1, 0 },
-            //        { -1, 1, 1 },
-            //        { 0, -1, -1 },
-            //        { 0, -1, 0 },
-            //        { 0, -1, 1 },
-            //        { 0, 0, -1 },
-            //        { 0, 0, 1 },
-            //        { 0, 1, -1 },
-            //        { 0, 1, 0 },
-            //        { 0, 1, 1 },
-            //        { 1, -1, -1 },
-            //        { 1, -1, 0 },
-            //        { 1, -1, 1 },
-            //        { 1, 0, -1 },
-            //        { 1, 0, 0 },
-            //        { 1, 0, 1 },
-            //        { 1, 1, -1 },
-            //        { 1, 1, 0 },
-            //        { 1, 1, 1 },
-            //    };
+            Func<IntVector, IntVector, IntVector> offsetPosition = (pos, posOffsets) => new IntVector() { X = pos.X + posOffsets.X, Y = pos.Y + posOffsets.Y, Z = pos.Z + posOffsets.Z, W = pos.W + posOffsets.W };
 
-            var offsets = new List<Vector<Int64>>();
-            foreach (var x in Enumerable.Range(-1, 2))
-                foreach (var y in Enumerable.Range(-1, 2))
-                    foreach (var z in Enumerable.Range(-1, 2))
-                    {
-                        offsets.Add(new Vector<Int64>(new Int64[3] { x, y, z}));
-                    }
-
-
-
-            var updatedCellStates = new CellDictionary(cellStates);
-
-            var expandedCellCoordinates = new HashSet<Tuple<Int64, Int64, Int64>>();
+            var expandedCellCoordinates = new HashSet<IntVector>();
             foreach (var keyValPair in cellStates.AsEnumerable())
             {
                 expandedCellCoordinates.Add(keyValPair.Key);
                 if (keyValPair.Value == true)
                 {
-                    for (int offsetIndex = 0; offsetIndex < offsets.GetLength(0); ++offsetIndex)
+                    for (int offsetIndex = 0; offsetIndex < offsets.Count; ++offsetIndex)
                     {
-                        expandedCellCoordinates.Add(Tuple.Create(keyValPair.Key.Item1 + offsets[offsetIndex, 0], keyValPair.Key.Item2 + offsets[offsetIndex, 1], keyValPair.Key.Item3 + offsets[offsetIndex, 2]));
-                        updatedCellStates[Tuple.Create(keyValPair.Key.Item1 + offsets[offsetIndex, 0], keyValPair.Key.Item2 + offsets[offsetIndex, 1], keyValPair.Key.Item3 + offsets[offsetIndex, 2])] = false;
+                        expandedCellCoordinates.Add(offsetPosition(keyValPair.Key, offsets[offsetIndex]));
+                        updatedCellStates[offsetPosition(keyValPair.Key, offsets[offsetIndex])] = false;
                     }
                 }
             }
@@ -71,34 +33,18 @@ namespace Day17
             foreach (var coordinates in expandedCellCoordinates)
             {
                 int numNeighboursActive = 0;
-
-
-                var test = Tuple.Create(2L, 0L, 0L);
-                if (Tuple.Create(coordinates.Item1, coordinates.Item2, coordinates.Item3).Equals(test))
-                {
-                    Console.Write("");
-                }
-
-                for (int offsetIndex = 0; offsetIndex < offsets.GetLength(0); ++offsetIndex)
+                for (int offsetIndex = 0; offsetIndex < offsets.Count; ++offsetIndex)
                 {
                     bool neighbourValue;
-                    if (cellStates.TryGetValue(Tuple.Create(coordinates.Item1 + offsets[offsetIndex, 0], coordinates.Item2 + offsets[offsetIndex, 1], coordinates.Item3 + offsets[offsetIndex, 2]), out neighbourValue))
-                    {
+                    if (cellStates.TryGetValue(offsetPosition(coordinates, offsets[offsetIndex]), out neighbourValue))
                         numNeighboursActive += neighbourValue == true ? 1 : 0;
-                    }
                 }
-
-
 
                 bool value;
-                if (cellStates.TryGetValue(Tuple.Create(coordinates.Item1, coordinates.Item2, coordinates.Item3), out value) && value == true)
-                {
-                    updatedCellStates[Tuple.Create(coordinates.Item1, coordinates.Item2, coordinates.Item3)] = numNeighboursActive == 2 || numNeighboursActive == 3 ? true : false;
-                }
+                if (cellStates.TryGetValue(coordinates, out value) && value == true)
+                    updatedCellStates[coordinates] = numNeighboursActive == 2 || numNeighboursActive == 3 ? true : false;
                 else
-                {
-                    updatedCellStates[Tuple.Create(coordinates.Item1, coordinates.Item2, coordinates.Item3)] = numNeighboursActive == 3 ? true : false;
-                }
+                    updatedCellStates[coordinates] = numNeighboursActive == 3 ? true : false;
             }
 
             return updatedCellStates;
@@ -108,24 +54,37 @@ namespace Day17
         {
             var inputData = File.ReadAllLines("input.txt");
 
-            var cellStates = new Dictionary<Tuple<Int64, Int64, Int64>, bool>();
+            var cellStates3D = new Dictionary<IntVector, bool>();
 
             Int64 x = 0, y = 0;
             inputData.ToList().ForEach(row =>
             {
-                row.ToList().ForEach(cell => cellStates[Tuple.Create(x++, y, 0L)] = inputData[y][(int)x - 1] == '#');
+                row.ToList().ForEach(cell => cellStates3D[new IntVector { X = x++, Y = y, Z = 0L, W = 0L }] = inputData[y][(int)x - 1] == '#');
                 ++y;
                 x = 0;
             });
 
+            var cellStates4D = new Dictionary<IntVector, bool>(cellStates3D);
+
+            var offsets3D = new List<IntVector>();
+            foreach (var x2 in Enumerable.Range(-1, 3)) foreach (var y2 in Enumerable.Range(-1, 3)) foreach (var z in Enumerable.Range(-1, 3))
+                        if ((x2 | y2 | z) != 0)
+                            offsets3D.Add(new IntVector { X = x2, Y = y2, Z = z });
+
+
+            var offsets4D = new List<IntVector>();
+            foreach (var x2 in Enumerable.Range(-1, 3)) foreach (var y2 in Enumerable.Range(-1, 3)) foreach (var z in Enumerable.Range(-1, 3)) foreach (var w in Enumerable.Range(-1, 3))
+                            if ((x2 | y2 | z | w) != 0)
+                                offsets4D.Add(new IntVector { X = x2, Y = y2, Z = z, W = w });
+
+
             for (int cycleIndex = 0; cycleIndex < 6; ++cycleIndex)
             {
-                var newCells = UpdateCells(cellStates);
-                Console.WriteLine("Num active cells: {0}", newCells.Where(value => value.Value == true && value.Key.Item3 == 0).Count());
-                cellStates = newCells;
+                cellStates3D = UpdateCells(cellStates3D, offsets3D);
+                cellStates4D = UpdateCells(cellStates4D, offsets4D);
             }
-
-            Console.WriteLine("Num active cells: {0}", cellStates.Values.Where(value => value == true).Count());
+            Console.WriteLine("Num active cells (3D): {0}", cellStates3D.Values.Where(value => value == true).Count());
+            Console.WriteLine("Num active cells (4D): {0}", cellStates4D.Values.Where(value => value == true).Count());
         }
     }
 }

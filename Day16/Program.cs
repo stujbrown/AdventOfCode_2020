@@ -32,7 +32,7 @@ namespace Day16
                     var validRanges = fields.Values.Select((ranges, index) => Tuple.Create(ranges, index)).Where(ranges => ranges.Item1.Where(range => ticket[ticketFieldIndex] >= range.Item1 && ticket[ticketFieldIndex] <= range.Item2).Count() != 0);
                     errorRate += (validRanges.Count() == 0) ? ticket[ticketFieldIndex] : 0;
 
-                    if (validRanges.Count() != 0) // ticket valid
+                    if (validRanges.Count() != 0)
                     {
                         foreach (var value in Enumerable.Range(0, fields.Keys.Count).Except(validRanges.Select(ranges => ranges.Item2)))
                         {

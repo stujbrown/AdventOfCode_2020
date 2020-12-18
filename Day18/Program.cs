@@ -10,12 +10,9 @@ namespace Day18
 {
     class Program
     {
-        static void Main(string[] args)
+        static Int64 DoMaths(string[] lines)
         {
-            var lines = File.ReadAllLines("input.txt");
-
-            //   ((((1 + 2) * 3) + 4) * 5) + 6
-
+            Int64 sum = 0;
             foreach (var line in lines)
             {
                 string expandedLine = line;
@@ -26,30 +23,51 @@ namespace Day18
                 var operations = new Stack<char>();
                 for (int i = 0; i < tokens.Count; ++i)
                 {
-                    if (tokens[i] == "(") ;
-                    else if (tokens[i] == ")") ;
+                    if (tokens[i] == "(") operations.Push('(');
+                    else if (tokens[i] == ")")
+                    {
+                        operations.Pop();
+                        if (operations.Count > 0 && operations.Peek() != '(')
+                        {
+                            var top = values.Pop();
+                            if (operations.Peek() == '+') values.Push(values.Pop() + top);
+                            else if (operations.Peek() == '-') values.Push(values.Pop() - top);
+                            else if (operations.Peek() == '/') values.Push(values.Pop() / top);
+                            else if (operations.Peek() == '*') values.Push(values.Pop() * top);
+                            operations.Pop();
+                        }
+                    }
+
                     else if (tokens[i] == "+" || tokens[i] == "-" || tokens[i] == "/" || tokens[i] == "*")
                     {
                         operations.Push(tokens[i][0]);
                     }
                     else
                     {
-                        values.Push(Int64.Parse(tokens[i]));
+                        if (operations.Count > 0 && operations.Peek() != '(')
+                        {
+                            if (operations.Peek() == '+') values.Push(values.Pop() + Int64.Parse(tokens[i]));
+                            else if (operations.Peek() == '-') values.Push(values.Pop() - Int64.Parse(tokens[i]));
+                            else if (operations.Peek() == '/') values.Push(values.Pop() / Int64.Parse(tokens[i]));
+                            else if (operations.Peek() == '*') values.Push(values.Pop() * Int64.Parse(tokens[i]));
+                            operations.Pop();
+                        }
+                        else
+                            values.Push(Int64.Parse(tokens[i]));
                     }
                 }
 
-                Int64 acc = 0;
-
-                //Int64 acc = 0;
-                //var newString = new StringBuilder();
-                //foreach (var parenthesis in stack)
-                //{
-                //    var substr = line[i]
-                //    var table = new DataTable();
-                //    table.Compute("", "");
-                //}
+                sum += values.Pop();
             }
 
+            return sum;
         }
+        static void Main(string[] args)
+        {
+            var lines = File.ReadAllLines("input.txt");
+            Console.WriteLine("PArt 1: {0}", DoMaths(lines));
+        }
+
     }
+
 }

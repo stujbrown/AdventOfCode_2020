@@ -19,7 +19,6 @@ namespace Day22
         static int PlayGame(List<long>[] playerDecks, bool recursiveCombat)
         {
             var stateRecord = new HashSet<string>();
-
             while (playerDecks.Where(playerDeck => playerDeck.Count > 0).Count() != 1)
             {
                 var startState = SerializeState(playerDecks);
@@ -44,7 +43,6 @@ namespace Day22
                 playerDecks[winner].AddRange(playedCards.Select(card => card.Value)); // put on bottom in winner order (already sorted)
                 stateRecord.Add(startState);
             }
-
             return playerDecks.Select((playerDeck, playerIndex) => KeyValuePair.Create(playerIndex, playerDeck)).Where(playerDeck => playerDeck.Value.Count > 0).First().Key;
         }
 

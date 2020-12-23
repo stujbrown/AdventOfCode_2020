@@ -9,78 +9,74 @@ namespace Day23
 {
     class Program
     {
-        static int IndexCup(int indexToWrap, int cupsInList)
-        {
-            return (indexToWrap > 0) ? (int)((long)indexToWrap % (long)cupsInList) : (int)(((long)cupsInList - Math.Abs((long)indexToWrap)) % (long)cupsInList);
-        }
+        static LinkedListNode<long> NextCup(LinkedListNode<long> current, LinkedList<long> list) => current.Next == null ? list.First : current.Next;
 
-        static void DoCrabShuffle(List<long> cups, int numMoves)
+        static void DoCrabShuffle(LinkedList<long> cups, int numMoves)
         {
             long lowest = cups.Min();
             long highest = cups.Max();
 
+            var nodeDictionary = new Dictionary<long, LinkedListNode<long>>(); // removed nodes are re-added to the list so this is stable
+
+            var nextAdd = cups.First;
+            while (nextAdd != null)
+            {
+                nodeDictionary.Add(nextAdd.Value, nextAdd);
+                nextAdd = nextAdd.Next;
+            }
 
             Func<long, long> subtractCupValue = (long startCupValue) => ((startCupValue - 1) < lowest) ? startCupValue = highest : (startCupValue - 1);
 
-            var currentCup = cups[0];
+            var currentCupNode = cups.First;
             for (long move = 0; move < numMoves; ++move)
             {
-                var currentIndex = cups.IndexOf(currentCup);
+                var currentCup = currentCupNode.Value;
 
-                var taken = new List<long>();
+                var taken = new LinkedListNode<long>[3];
+                var nextTake = NextCup(currentCupNode, cups);
                 foreach (var takeCount in Enumerable.Range(0, 3))
-                    taken.Add(cups[IndexCup((currentIndex + 1) + takeCount, cups.Count)]);
+                {
+                    taken[takeCount] = nextTake;
+                    nextTake = NextCup(nextTake, cups);
+                }
 
-                taken.ForEach(cup => cups.Remove(cup));
-
-                // Debug.Assert(cups.Contains(cupValue) && cups[currentCupIndex] == cupValue); // ensure cup/index is preserved
+                Array.ForEach(taken, takenNode => cups.Remove(takenNode));
 
                 var destinationCup = subtractCupValue(currentCup);
-                while (taken.Contains(destinationCup))
+                while (taken.Select(cup => cup.Value).Contains(destinationCup))
                     destinationCup = subtractCupValue(destinationCup);
 
-                int destinationIndex = cups.IndexOf(destinationCup) + 1;
-                cups.InsertRange(destinationIndex, taken);
-
-                currentCup = cups[IndexCup(cups.IndexOf(currentCup) + 1, cups.Count)];
-
-                //Array.ForEach(cups.ToArray(), cup => Console.Write(cup));
-                //Console.WriteLine("");
+                var destinationNode = nodeDictionary[destinationCup];
+                Array.ForEach(taken, takenNode => cups.AddAfter(destinationNode, destinationNode = takenNode));
+                currentCupNode = NextCup(currentCupNode, cups);
             }
         }
-
 
         static void Main(string[] args)
         {
             var originalCups = Array.ConvertAll(File.ReadAllLines("input.txt")[0].ToCharArray(), c => long.Parse(c.ToString())).ToList();
-            var cups = new List<long>(originalCups);
+            var cups = new LinkedList<long>(originalCups);
 
             DoCrabShuffle(cups, 100);
 
             var str = new StringBuilder();
-            int iterationIndex = IndexCup(cups.IndexOf(1) + 1, cups.Count);
-            while (cups[iterationIndex] != 1)
+            var next = NextCup(cups.Find(1), cups);
+            while (next.Value != 1)
             {
-                str.Append(cups[IndexCup(iterationIndex, cups.Count)]);
-                iterationIndex = IndexCup(++iterationIndex, cups.Count);
+                str.Append(next.Value);
+                next = NextCup(next, cups);
             }
             Console.WriteLine("Cup labels = {0}", str.ToString());
 
-            var lotsOfCups = new List<long>(originalCups);
-
-            long nextCup = cups.Max() + 1;
+            var lotsOfCups = new LinkedList<long>(originalCups);
+            long nextCup = lotsOfCups.Max() + 1;
             for (int totalCups = lotsOfCups.Count; totalCups < 1000000; ++totalCups)
-            {
-                lotsOfCups.Add(nextCup++);
-            }
+                lotsOfCups.AddLast(nextCup++);
 
             DoCrabShuffle(lotsOfCups, 10000000);
 
-            iterationIndex = lotsOfCups.IndexOf(1);
-            var label1 = cups[IndexCup( iterationIndex + 1, cups.Count)];
-            var label2 = cups[IndexCup(iterationIndex + 2, cups.Count)];
-
-            Console.WriteLine("Cup labels for long game = {0}", label1 * label2);
+            var label1 = NextCup(lotsOfCups.Find(1), lotsOfCups);
+            Console.WriteLine("Cup labels for long game = {0}", label1.Value * NextCup(label1, lotsOfCups).Value);
         }
     }
 }
